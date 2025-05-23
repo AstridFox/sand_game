@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "behavior-library": ["../packages/behavior-library/src"],
+      "simulation-engine": ["../packages/simulation-engine/src"],
+      "ui-renderer": ["../packages/ui-renderer/src"]
+    }
+  },
+  "include": ["src"]
+}

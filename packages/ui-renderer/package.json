@@ -1,0 +1,15 @@
+{
+  "name": "ui-renderer",
+  "version": "0.1.0",
+  "description": "Canvas rendering and UI controls for the falling sand simulation",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "behavior-library": "^0.1.0",
+    "simulation-engine": "^0.1.0"
+  }
+}

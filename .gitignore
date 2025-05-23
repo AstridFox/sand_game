@@ -3,3 +3,5 @@
 
 # Temporary older versions of files
 OLD/
+
+node_modules/*
