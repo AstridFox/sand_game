@@ -32,6 +32,82 @@ export function createUI(options: UIOptions): void {
   const palette = document.createElement('div')
   palette.className = 'palette'
 
+  let brushSize = 1
+  let brushRoundness = 0
+
+  const brushButton = document.createElement('button')
+  brushButton.className = 'brush-button'
+  brushButton.textContent = '🖌️'
+  palette.appendChild(brushButton)
+
+  const separator = document.createElement('hr')
+  separator.className = 'palette-separator'
+  palette.appendChild(separator)
+
+  const brushPanel = document.createElement('div')
+  brushPanel.className = 'brush-panel'
+
+  const sizeControl = document.createElement('div')
+  sizeControl.className = 'brush-control'
+  const sizeLabel = document.createElement('label')
+  sizeLabel.textContent = 'Size'
+  const sizeSlider = document.createElement('input')
+  sizeSlider.type = 'range'
+  sizeSlider.min = '1'
+  sizeSlider.max = '50'
+  sizeSlider.value = brushSize.toString()
+  sizeSlider.className = 'brush-size-slider'
+  sizeControl.appendChild(sizeLabel)
+  sizeControl.appendChild(sizeSlider)
+  brushPanel.appendChild(sizeControl)
+
+  const roundControl = document.createElement('div')
+  roundControl.className = 'brush-control'
+  const roundLabel = document.createElement('label')
+  roundLabel.textContent = 'Roundness'
+  const roundSlider = document.createElement('input')
+  roundSlider.type = 'range'
+  roundSlider.min = '0'
+  roundSlider.max = '100'
+  roundSlider.value = (brushRoundness * 100).toString()
+  roundSlider.className = 'brush-roundness-slider'
+  roundControl.appendChild(roundLabel)
+  roundControl.appendChild(roundSlider)
+  brushPanel.appendChild(roundControl)
+
+  root.appendChild(brushPanel)
+
+  sizeSlider.addEventListener('input', () => {
+    brushSize = Number(sizeSlider.value)
+  })
+  roundSlider.addEventListener('input', () => {
+    brushRoundness = Number(roundSlider.value) / 100
+  })
+
+  const showBrushPanel = () => brushPanel.classList.add('visible')
+  const hideBrushPanel = (e: MouseEvent) => {
+    const rectBtn = brushButton.getBoundingClientRect()
+    const rectPanel = brushPanel.getBoundingClientRect()
+    const x = e.clientX
+    const y = e.clientY
+    const xMin = Math.min(rectBtn.left, rectPanel.left)
+    const xMax = Math.max(rectBtn.right, rectPanel.right)
+    const yMin = Math.min(rectBtn.top, rectPanel.top)
+    const yMax = Math.max(rectBtn.bottom, rectPanel.bottom)
+    if (x < xMin || x > xMax || y < yMin || y > yMax) {
+      brushPanel.classList.remove('visible')
+    }
+  }
+  brushButton.addEventListener('mouseenter', (e: MouseEvent) => {
+    showBrushPanel()
+    const rect = brushButton.getBoundingClientRect()
+    brushPanel.style.left = `${rect.right + 8}px`
+    brushPanel.style.top = `${rect.top}px`
+  })
+  brushButton.addEventListener('mouseleave', hideBrushPanel)
+  brushPanel.addEventListener('mouseenter', showBrushPanel)
+  brushPanel.addEventListener('mouseleave', hideBrushPanel)
+
   let selectedCellId = registry.getByName('Sand')?.id ?? 0
 
   const updateSelection = (button: HTMLButtonElement) => {
@@ -80,9 +156,10 @@ export function createUI(options: UIOptions): void {
   }
   ctx.imageSmoothingEnabled = false
 
-  canvas.style.width = `${dims.width * cellSize}px`
-  canvas.style.height = `${dims.height * cellSize}px`
-  root.appendChild(canvas)
+  const wrapper = document.createElement('div')
+  wrapper.className = 'simulation-wrapper'
+  wrapper.appendChild(canvas)
+  root.appendChild(wrapper)
 
   container.appendChild(root)
 
@@ -145,9 +222,22 @@ export function createUI(options: UIOptions): void {
   }
 
   const drawAt = (e: MouseEvent) => {
-    const { x, y } = getCellCoord(e)
-    if (x >= 0 && x < dims.width && y >= 0 && y < dims.height) {
-      grid[y * dims.width + x] = selectedCellId
+    const { x: cx, y: cy } = getCellCoord(e)
+    const r = brushSize / 2
+    const thr = 1 + brushRoundness * (Math.SQRT2 - 1)
+    const thrR = thr * r
+    const thrRSq = thrR * thrR
+    const limit = Math.ceil(r)
+    for (let dy = -limit; dy <= limit; dy++) {
+      for (let dx = -limit; dx <= limit; dx++) {
+        if (dx * dx + dy * dy <= thrRSq) {
+          const x = cx + dx
+          const y = cy + dy
+          if (x >= 0 && x < dims.width && y >= 0 && y < dims.height) {
+            grid[y * dims.width + x] = selectedCellId
+          }
+        }
+      }
     }
   }
 

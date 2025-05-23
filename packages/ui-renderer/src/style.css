@@ -46,8 +46,16 @@
   border-radius: 2px;
 }
 
-.simulation-canvas {
+.simulation-wrapper {
   flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.simulation-canvas {
+  width: min(100%, 100vh);
+  aspect-ratio: 1 / 1;
   background-color: #000;
   cursor: crosshair;
   image-rendering: pixelated;
@@ -71,4 +79,52 @@
 
 .tooltip.visible {
   opacity: 1;
+}
+
+.brush-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  padding: 4px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  color: #ccc;
+}
+.brush-button:hover {
+  background-color: #555;
+  border-radius: 4px;
+}
+.palette-separator {
+  border: none;
+  height: 1px;
+  background-color: #444;
+  margin: 8px 0;
+}
+.brush-panel {
+  position: absolute;
+  background-color: #2d2d2d;
+  border: 1px solid #444;
+  padding: 8px;
+  border-radius: 4px;
+  display: none;
+  z-index: 1000;
+}
+.brush-panel.visible {
+  display: block;
+}
+.brush-control {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.brush-control:last-child {
+  margin-bottom: 0;
+}
+.brush-control label {
+  flex: 1;
+  color: #ccc;
+  font-size: 14px;
+}
+.brush-control input[type="range"] {
+  flex: 1;
 }

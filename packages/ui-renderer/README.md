@@ -8,6 +8,7 @@ Canvas rendering and UI controls for the falling sand simulation.
 - Simulation canvas with pixelated rendering
 - Cell palette with icons for each cell type
 - Click and drag to draw cells
+- Brush tool with size and roundness controls (hover the 🖌️ icon above the cell palette)
 
 ## Usage
 
