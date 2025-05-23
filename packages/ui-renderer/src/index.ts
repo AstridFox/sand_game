@@ -25,6 +25,10 @@ export function createUI(options: UIOptions): void {
   const root = document.createElement('div')
   root.className = 'ui-root'
 
+  const tooltip = document.createElement('div')
+  tooltip.className = 'tooltip'
+  root.appendChild(tooltip)
+
   const palette = document.createElement('div')
   palette.className = 'palette'
 
@@ -41,8 +45,17 @@ export function createUI(options: UIOptions): void {
   registry.getAll().forEach(cell => {
     const button = document.createElement('button')
     button.className = 'palette-item'
-    button.title = cell.name
     button.dataset.cellId = cell.id.toString()
+
+    button.addEventListener('mouseenter', (e: MouseEvent) => {
+      tooltip.textContent = cell.name
+      tooltip.style.left = `${(e.target.getBoundingClientRect().left + 48)}px`
+      tooltip.style.top = `${e.target.getBoundingClientRect().top}px`
+      tooltip.classList.add('visible')
+    })
+    button.addEventListener('mouseleave', () => {
+      tooltip.classList.remove('visible')
+    })
 
     const icon = document.createElement('div')
     icon.className = 'palette-item-icon'
