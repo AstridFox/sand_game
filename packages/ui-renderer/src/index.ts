@@ -10,6 +10,102 @@ import {
   type CellDefinition
 } from 'simulation-engine'
 
+// Helper to show tooltip on element hover
+function addTooltipListeners(
+  element: HTMLElement,
+  tooltip: HTMLElement,
+  getText: (e: MouseEvent) => string
+) {
+  element.addEventListener('mouseenter', (e: MouseEvent) => {
+    tooltip.textContent = getText(e)
+    const rect = (e.target as HTMLElement).getBoundingClientRect()
+    tooltip.style.left = `${rect.left + 48}px`
+    tooltip.style.top = `${rect.top}px`
+    tooltip.classList.add('visible')
+  })
+  element.addEventListener('mouseleave', () => {
+    tooltip.classList.remove('visible')
+  })
+}
+
+// Helper to toggle visibility of a panel next to a button
+function setupPanelToggle(button: HTMLElement, panel: HTMLElement) {
+  const show = () => panel.classList.add('visible')
+  const hide = (e: MouseEvent) => {
+    const rectBtn = button.getBoundingClientRect()
+    const rectPanel = panel.getBoundingClientRect()
+    const x = e.clientX
+    const y = e.clientY
+    const xMin = Math.min(rectBtn.left, rectPanel.left)
+    const xMax = Math.max(rectBtn.right, rectPanel.right)
+    const yMin = Math.min(rectBtn.top, rectPanel.top)
+    const yMax = Math.max(rectBtn.bottom, rectPanel.bottom)
+    if (x < xMin || x > xMax || y < yMin || y > yMax) {
+      panel.classList.remove('visible')
+    }
+  }
+
+  button.addEventListener('mouseenter', (e: MouseEvent) => {
+    show()
+    const rect = button.getBoundingClientRect()
+    panel.style.left = `${rect.right + 8}px`
+    panel.style.top = `${rect.top}px`
+  })
+  button.addEventListener('mouseleave', hide)
+  panel.addEventListener('mouseenter', show)
+  panel.addEventListener('mouseleave', hide)
+}
+
+// Helper to create a labeled range slider control
+function createSliderControl(
+  labelText: string,
+  min: number,
+  max: number,
+  initial: number,
+  sliderClass: string
+): { control: HTMLDivElement; slider: HTMLInputElement } {
+  const control = document.createElement('div')
+  control.className = 'brush-control'
+  const label = document.createElement('label')
+  label.textContent = labelText
+  const slider = document.createElement('input')
+  slider.type = 'range'
+  slider.min = String(min)
+  slider.max = String(max)
+  slider.value = initial.toString()
+  slider.className = sliderClass
+  control.appendChild(label)
+  control.appendChild(slider)
+  return { control, slider }
+}
+
+// Helper to create a separator line
+function createSeparator(className = 'palette-separator'): HTMLHRElement {
+  const hr = document.createElement('hr')
+  hr.className = className
+  return hr
+}
+
+/**
+ * Parse a CSS hex color ("#rrggbb" or short form) or "rgb(r,g,b)" into an RGB tuple.
+ */
+function hexToRgb(hex: string): [number, number, number] | null {
+  if (hex.startsWith('rgb(')) {
+    const m = hex.match(/^rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i)
+    if (m) {
+      return [Number(m[1]), Number(m[2]), Number(m[3])]
+    }
+    return null
+  }
+  let clean = hex.replace('#', '')
+  if (clean.length === 3) {
+    clean = clean.split('').map(c => c + c).join('')
+  }
+  const num = parseInt(clean, 16)
+  if (isNaN(num)) return null
+  return [(num >> 16) & 255, (num >> 8) & 255, num & 255]
+}
+
 export interface UIOptions {
   container: HTMLElement
   dims: Dims
@@ -21,6 +117,11 @@ export function createUI(options: UIOptions): void {
   const { container, dims, cellSize = 4 } = options
   let horizontalJitter = options.horizontalJitter ?? false
 
+  // Simulation state (grids and scan direction)
+  let [grid, newGrid] = createGrids(dims)
+  const scanState: ScanState = createScanState()
+
+  // Clear and prepare root container
   container.innerHTML = ''
 
   const root = document.createElement('div')
@@ -41,39 +142,18 @@ export function createUI(options: UIOptions): void {
   brushButton.textContent = '🖌️'
   palette.appendChild(brushButton)
 
-  const separator = document.createElement('hr')
-  separator.className = 'palette-separator'
-  palette.appendChild(separator)
+  palette.appendChild(createSeparator())
 
   const brushPanel = document.createElement('div')
   brushPanel.className = 'brush-panel'
 
-  const sizeControl = document.createElement('div')
-  sizeControl.className = 'brush-control'
-  const sizeLabel = document.createElement('label')
-  sizeLabel.textContent = 'Size'
-  const sizeSlider = document.createElement('input')
-  sizeSlider.type = 'range'
-  sizeSlider.min = '1'
-  sizeSlider.max = '50'
-  sizeSlider.value = brushSize.toString()
-  sizeSlider.className = 'brush-size-slider'
-  sizeControl.appendChild(sizeLabel)
-  sizeControl.appendChild(sizeSlider)
+  const { control: sizeControl, slider: sizeSlider } = 
+    createSliderControl('Size', 1, 50, brushSize, 'brush-size-slider')
   brushPanel.appendChild(sizeControl)
 
-  const roundControl = document.createElement('div')
-  roundControl.className = 'brush-control'
-  const roundLabel = document.createElement('label')
-  roundLabel.textContent = 'Roundness'
-  const roundSlider = document.createElement('input')
-  roundSlider.type = 'range'
-  roundSlider.min = '0'
-  roundSlider.max = '100'
-  roundSlider.value = (brushRoundness * 100).toString()
-  roundSlider.className = 'brush-roundness-slider'
-  roundControl.appendChild(roundLabel)
-  roundControl.appendChild(roundSlider)
+  const { control: roundControl, slider: roundSlider } =
+    createSliderControl('Roundness', 0, 100, brushRoundness * 100,
+    'brush-roundness-slider')
   brushPanel.appendChild(roundControl)
 
   root.appendChild(brushPanel)
@@ -85,29 +165,7 @@ export function createUI(options: UIOptions): void {
     brushRoundness = Number(roundSlider.value) / 100
   })
 
-  const showBrushPanel = () => brushPanel.classList.add('visible')
-  const hideBrushPanel = (e: MouseEvent) => {
-    const rectBtn = brushButton.getBoundingClientRect()
-    const rectPanel = brushPanel.getBoundingClientRect()
-    const x = e.clientX
-    const y = e.clientY
-    const xMin = Math.min(rectBtn.left, rectPanel.left)
-    const xMax = Math.max(rectBtn.right, rectPanel.right)
-    const yMin = Math.min(rectBtn.top, rectPanel.top)
-    const yMax = Math.max(rectBtn.bottom, rectPanel.bottom)
-    if (x < xMin || x > xMax || y < yMin || y > yMax) {
-      brushPanel.classList.remove('visible')
-    }
-  }
-  brushButton.addEventListener('mouseenter', (e: MouseEvent) => {
-    showBrushPanel()
-    const rect = brushButton.getBoundingClientRect()
-    brushPanel.style.left = `${rect.right + 8}px`
-    brushPanel.style.top = `${rect.top}px`
-  })
-  brushButton.addEventListener('mouseleave', hideBrushPanel)
-  brushPanel.addEventListener('mouseenter', showBrushPanel)
-  brushPanel.addEventListener('mouseleave', hideBrushPanel)
+  setupPanelToggle(brushButton, brushPanel)
 
   let selectedCellId = registry.getByName('Sand')?.id ?? 0
 
@@ -124,15 +182,7 @@ export function createUI(options: UIOptions): void {
     button.className = 'palette-item'
     button.dataset.cellId = cell.id.toString()
 
-    button.addEventListener('mouseenter', (e: MouseEvent) => {
-      tooltip.textContent = cell.name
-      tooltip.style.left = `${(e.target.getBoundingClientRect().left + 48)}px`
-      tooltip.style.top = `${e.target.getBoundingClientRect().top}px`
-      tooltip.classList.add('visible')
-    })
-    button.addEventListener('mouseleave', () => {
-      tooltip.classList.remove('visible')
-    })
+    addTooltipListeners(button, tooltip, () => cell.name)
 
     const icon = document.createElement('div')
     icon.className = 'palette-item-icon'
@@ -145,22 +195,12 @@ export function createUI(options: UIOptions): void {
   })
 
   // Separator and clear-all button to reset canvas cells to Air
-  const resetSeparator = document.createElement('hr')
-  resetSeparator.className = 'palette-separator'
-  palette.appendChild(resetSeparator)
+  palette.appendChild(createSeparator())
 
   const clearButton = document.createElement('button')
   clearButton.className = 'brush-button'
   clearButton.textContent = '🧹'
-  clearButton.addEventListener('mouseenter', (e: MouseEvent) => {
-    tooltip.textContent = 'Clear Canvas'
-    tooltip.style.left = `${(e.target.getBoundingClientRect().left + 48)}px`
-    tooltip.style.top = `${e.target.getBoundingClientRect().top}px`
-    tooltip.classList.add('visible')
-  })
-  clearButton.addEventListener('mouseleave', () => {
-    tooltip.classList.remove('visible')
-  })
+  addTooltipListeners(clearButton, tooltip, () => 'Clear Canvas')
   clearButton.addEventListener('click', () => {
     ;[grid, newGrid] = createGrids(dims)
   })
@@ -169,40 +209,10 @@ export function createUI(options: UIOptions): void {
   const gearButton = document.createElement('button')
   gearButton.className = 'brush-button'
   gearButton.textContent = '⚙️'
-  gearButton.addEventListener('mouseenter', (e: MouseEvent) => {
-    tooltip.textContent = 'Settings'
-    tooltip.style.left = `${(e.target.getBoundingClientRect().left + 48)}px`
-    tooltip.style.top = `${e.target.getBoundingClientRect().top}px`
-    tooltip.classList.add('visible')
-  })
-  gearButton.addEventListener('mouseleave', () => {
-    tooltip.classList.remove('visible')
-  })
+  addTooltipListeners(gearButton, tooltip, () => 'Settings')
   palette.appendChild(gearButton)
 
-  root.appendChild(palette)
-
-  const canvas = document.createElement('canvas')
-  canvas.className = 'simulation-canvas'
-  canvas.width = dims.width
-  canvas.height = dims.height
-
-  const ctx = canvas.getContext('2d')
-  if (!ctx) {
-    throw new Error('Failed to get 2D rendering context')
-  }
-  ctx.imageSmoothingEnabled = false
-
-  const wrapper = document.createElement('div')
-  wrapper.className = 'simulation-wrapper'
-  wrapper.appendChild(canvas)
-  root.appendChild(wrapper)
-
-  container.appendChild(root)
-
-  let [grid, newGrid] = createGrids(dims)
-  const scanState: ScanState = createScanState()
-
+  // Settings panel (horizontal jitter & scan direction)
   const settingsPanel = document.createElement('div')
   settingsPanel.className = 'settings-panel'
 
@@ -230,30 +240,7 @@ export function createUI(options: UIOptions): void {
   settingsPanel.appendChild(scanControl)
   root.appendChild(settingsPanel)
 
-  const showSettingsPanel = () => settingsPanel.classList.add('visible')
-  const hideSettingsPanel = (e: MouseEvent) => {
-    const rectBtn = gearButton.getBoundingClientRect()
-    const rectPanel = settingsPanel.getBoundingClientRect()
-    const x = e.clientX
-    const y = e.clientY
-    const xMin = Math.min(rectBtn.left, rectPanel.left)
-    const xMax = Math.max(rectBtn.right, rectPanel.right)
-    const yMin = Math.min(rectBtn.top, rectPanel.top)
-    const yMax = Math.max(rectBtn.bottom, rectPanel.bottom)
-    if (x < xMin || x > xMax || y < yMin || y > yMax) {
-      settingsPanel.classList.remove('visible')
-    }
-  }
-
-  gearButton.addEventListener('mouseenter', (e: MouseEvent) => {
-    showSettingsPanel()
-    const rect = gearButton.getBoundingClientRect()
-    settingsPanel.style.left = `${rect.right + 8}px`
-    settingsPanel.style.top = `${rect.top}px`
-  })
-  gearButton.addEventListener('mouseleave', hideSettingsPanel)
-  settingsPanel.addEventListener('mouseenter', showSettingsPanel)
-  settingsPanel.addEventListener('mouseleave', hideSettingsPanel)
+  setupPanelToggle(gearButton, settingsPanel)
 
   jitterCheckbox.addEventListener('change', () => {
     horizontalJitter = jitterCheckbox.checked
@@ -261,6 +248,30 @@ export function createUI(options: UIOptions): void {
   scanCheckbox.addEventListener('change', () => {
     scanState.toggleScanDirection = scanCheckbox.checked
   })
+
+  root.appendChild(palette)
+
+  const canvas = document.createElement('canvas')
+  canvas.className = 'simulation-canvas'
+  canvas.width = dims.width
+  canvas.height = dims.height
+
+  const ctx = canvas.getContext('2d')
+  if (!ctx) {
+    throw new Error('Failed to get 2D rendering context')
+  }
+  ctx.imageSmoothingEnabled = false
+
+  canvas.style.width = `${dims.width * cellSize}px`
+  canvas.style.height = `${dims.height * cellSize}px`
+
+  const wrapper = document.createElement('div')
+  wrapper.className = 'simulation-wrapper'
+  wrapper.appendChild(canvas)
+  root.appendChild(wrapper)
+
+  // Attach UI to the container
+  container.appendChild(root)
 
   const cells = registry.getAll()
   const cellMap: Record<number, CellDefinition> = {}
@@ -272,12 +283,15 @@ export function createUI(options: UIOptions): void {
     new Set(cells.map(c => c.priority))
   ).sort((a, b) => a - b)
 
+
   const idToRgb: [number, number, number][] = []
   cells.forEach(c => {
     const hex = c.color(0, 0)
     const rgb = hexToRgb(hex)
     idToRgb[c.id] = rgb || [0, 0, 0]
   })
+
+  const AIR_ID = registry.getByName('Air')?.id ?? 0
 
   const imageData = ctx.createImageData(dims.width, dims.height)
 
@@ -299,7 +313,7 @@ export function createUI(options: UIOptions): void {
       data[idx] = r
       data[idx + 1] = g
       data[idx + 2] = b
-      data[idx + 3] = id === registry.getByName('Air')?.id ? 0 : 255
+      data[idx + 3] = id === AIR_ID ? 0 : 255
     }
 
     ctx.putImageData(imageData, 0, 0)
@@ -345,21 +359,4 @@ export function createUI(options: UIOptions): void {
   window.addEventListener('mouseup', () => {
     drawing = false
   })
-}
-
-function hexToRgb(hex: string): [number, number, number] | null {
-  if (hex.startsWith('rgb(')) {
-    const m = hex.match(/^rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i)
-    if (m) {
-      return [Number(m[1]), Number(m[2]), Number(m[3])]
-    }
-    return null
-  }
-  let clean = hex.replace('#', '')
-  if (clean.length === 3) {
-    clean = clean.split('').map(c => c + c).join('')
-  }
-  const num = parseInt(clean, 16)
-  if (isNaN(num)) return null
-  return [(num >> 16) & 255, (num >> 8) & 255, num & 255]
 }
