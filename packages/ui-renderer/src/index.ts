@@ -143,6 +143,28 @@ export function createUI(options: UIOptions): void {
 
   })
 
+  // Separator and clear-all button to reset canvas cells to Air
+  const resetSeparator = document.createElement('hr')
+  resetSeparator.className = 'palette-separator'
+  palette.appendChild(resetSeparator)
+
+  const clearButton = document.createElement('button')
+  clearButton.className = 'brush-button'
+  clearButton.textContent = '🧹'
+  clearButton.addEventListener('mouseenter', (e: MouseEvent) => {
+    tooltip.textContent = 'Clear Canvas'
+    tooltip.style.left = `${(e.target.getBoundingClientRect().left + 48)}px`
+    tooltip.style.top = `${e.target.getBoundingClientRect().top}px`
+    tooltip.classList.add('visible')
+  })
+  clearButton.addEventListener('mouseleave', () => {
+    tooltip.classList.remove('visible')
+  })
+  clearButton.addEventListener('click', () => {
+    ;[grid, newGrid] = createGrids(dims)
+  })
+  palette.appendChild(clearButton)
+
   root.appendChild(palette)
 
   const canvas = document.createElement('canvas')
