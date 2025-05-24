@@ -18,7 +18,8 @@ export interface UIOptions {
 }
 
 export function createUI(options: UIOptions): void {
-  const { container, dims, cellSize = 4, horizontalJitter = false } = options
+  const { container, dims, cellSize = 4 } = options
+  let horizontalJitter = options.horizontalJitter ?? false
 
   container.innerHTML = ''
 
@@ -165,6 +166,20 @@ export function createUI(options: UIOptions): void {
   })
   palette.appendChild(clearButton)
 
+  const gearButton = document.createElement('button')
+  gearButton.className = 'brush-button'
+  gearButton.textContent = '⚙️'
+  gearButton.addEventListener('mouseenter', (e: MouseEvent) => {
+    tooltip.textContent = 'Settings'
+    tooltip.style.left = `${(e.target.getBoundingClientRect().left + 48)}px`
+    tooltip.style.top = `${e.target.getBoundingClientRect().top}px`
+    tooltip.classList.add('visible')
+  })
+  gearButton.addEventListener('mouseleave', () => {
+    tooltip.classList.remove('visible')
+  })
+  palette.appendChild(gearButton)
+
   root.appendChild(palette)
 
   const canvas = document.createElement('canvas')
@@ -187,6 +202,65 @@ export function createUI(options: UIOptions): void {
 
   let [grid, newGrid] = createGrids(dims)
   const scanState: ScanState = createScanState()
+
+  const settingsPanel = document.createElement('div')
+  settingsPanel.className = 'settings-panel'
+
+  const jitterControl = document.createElement('div')
+  jitterControl.className = 'settings-control'
+  const jitterCheckbox = document.createElement('input')
+  jitterCheckbox.type = 'checkbox'
+  jitterCheckbox.checked = horizontalJitter
+  const jitterLabel = document.createElement('label')
+  jitterLabel.textContent = 'Horizontal Jitter'
+  jitterControl.appendChild(jitterCheckbox)
+  jitterControl.appendChild(jitterLabel)
+
+  const scanControl = document.createElement('div')
+  scanControl.className = 'settings-control'
+  const scanCheckbox = document.createElement('input')
+  scanCheckbox.type = 'checkbox'
+  scanCheckbox.checked = scanState.toggleScanDirection
+  const scanLabel = document.createElement('label')
+  scanLabel.textContent = 'Toggle Scan Direction'
+  scanControl.appendChild(scanCheckbox)
+  scanControl.appendChild(scanLabel)
+
+  settingsPanel.appendChild(jitterControl)
+  settingsPanel.appendChild(scanControl)
+  root.appendChild(settingsPanel)
+
+  const showSettingsPanel = () => settingsPanel.classList.add('visible')
+  const hideSettingsPanel = (e: MouseEvent) => {
+    const rectBtn = gearButton.getBoundingClientRect()
+    const rectPanel = settingsPanel.getBoundingClientRect()
+    const x = e.clientX
+    const y = e.clientY
+    const xMin = Math.min(rectBtn.left, rectPanel.left)
+    const xMax = Math.max(rectBtn.right, rectPanel.right)
+    const yMin = Math.min(rectBtn.top, rectPanel.top)
+    const yMax = Math.max(rectBtn.bottom, rectPanel.bottom)
+    if (x < xMin || x > xMax || y < yMin || y > yMax) {
+      settingsPanel.classList.remove('visible')
+    }
+  }
+
+  gearButton.addEventListener('mouseenter', (e: MouseEvent) => {
+    showSettingsPanel()
+    const rect = gearButton.getBoundingClientRect()
+    settingsPanel.style.left = `${rect.right + 8}px`
+    settingsPanel.style.top = `${rect.top}px`
+  })
+  gearButton.addEventListener('mouseleave', hideSettingsPanel)
+  settingsPanel.addEventListener('mouseenter', showSettingsPanel)
+  settingsPanel.addEventListener('mouseleave', hideSettingsPanel)
+
+  jitterCheckbox.addEventListener('change', () => {
+    horizontalJitter = jitterCheckbox.checked
+  })
+  scanCheckbox.addEventListener('change', () => {
+    scanState.toggleScanDirection = scanCheckbox.checked
+  })
 
   const cells = registry.getAll()
   const cellMap: Record<number, CellDefinition> = {}

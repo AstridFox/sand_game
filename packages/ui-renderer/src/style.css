@@ -128,3 +128,31 @@
 .brush-control input[type="range"] {
   flex: 1;
 }
+
+.settings-panel {
+  position: absolute;
+  background-color: #2d2d2d;
+  border: 1px solid #444;
+  padding: 8px;
+  border-radius: 4px;
+  display: none;
+  z-index: 1000;
+}
+.settings-panel.visible {
+  display: block;
+}
+.settings-control {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.settings-control:last-child {
+  margin-bottom: 0;
+}
+.settings-control input[type="checkbox"] {
+  margin-right: 8px;
+}
+.settings-control label {
+  color: #ccc;
+  font-size: 14px;
+}
