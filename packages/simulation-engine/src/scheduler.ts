@@ -87,33 +87,22 @@ export function update(
       scanState.scanBottomToTop ? y >= 0 : y < height;
       y += scanState.scanBottomToTop ? -1 : 1
     ) {
-      if (horizontalJitter) {
-        const offset = Math.floor(Math.random() * width);
-        for (let dx = 0; dx < width; dx++) {
-          const x = scanState.scanLeftToRight
+      const offset = horizontalJitter ? Math.floor(Math.random() * width) : 0;
+      for (let dx = 0; dx < width; dx++) {
+        let x: number;
+        if (horizontalJitter) {
+          x = scanState.scanLeftToRight
             ? (offset + dx) % width
             : (offset - dx + width) % width;
-          const i = y * width + x;
-          const cell = cellMap[grid[i]];
-          if (cell.priority === prio) {
-            cell.update(i, grid, newGrid, dims);
-          }
+        } else if (scanState.scanLeftToRight) {
+          x = dx;
+        } else {
+          x = width - 1 - dx;
         }
-      } else if (scanState.scanLeftToRight) {
-        for (let x = 0; x < width; x++) {
-          const i = y * width + x;
-          const cell = cellMap[grid[i]];
-          if (cell.priority === prio) {
-            cell.update(i, grid, newGrid, dims);
-          }
-        }
-      } else {
-        for (let x = width - 1; x >= 0; x--) {
-          const i = y * width + x;
-          const cell = cellMap[grid[i]];
-          if (cell.priority === prio) {
-            cell.update(i, grid, newGrid, dims);
-          }
+        const i = y * width + x;
+        const cell = cellMap[grid[i]];
+        if (cell.priority === prio) {
+          cell.update(i, grid, newGrid, dims);
         }
       }
     }
