@@ -1,67 +1,87 @@
-# Simple Falling Sand Game (Monorepo)
+# simple-falling-sand-game
 
-This repository is a ground-up rewrite of the Simple Falling Sand Game into a modular, maintainable, and testable codebase. The legacy version is located in `OLD/` for reference.
+Monorepo for a simple falling sand simulation game, composed of reusable packages and a web-based demo.
 
-## Project Layout
+## Overview
 
-```
-.
-├── docs/                       # High-level design documents
-│   ├── architecture.md         # Layered architecture overview
-│   └── module-overview.md      # Responsibilities & API surface for each module
-├── packages/
-│   ├── behavior-library/       # Pure cell behavior rules & factories
-│   ├── simulation-engine/      # Grid, scheduler, simulation loop
-│   └── ui-renderer/            # Canvas & controls UI layer
-├── apps/
-│   └── web-demo/               # Browser demo application (Vite + HMR)
-├── redesign.md                 # Design proposal and migration roadmap
-├── package.json                # Root workspace configuration
-└── tsconfig.*                  # Shared TypeScript configuration
-```
+This repository contains the following workspaces:
+
+- **behavior-library**: Cell type definitions and behavior pipelines for the simulation.
+- **simulation-engine**: Double-buffered grid and scheduler loop engine.
+- **ui-renderer**: Canvas rendering and UI controls.
+- **web-demo**: Demo application combining the packages in a browser.
 
 ## Prerequisites
 
-This project uses Yarn workspaces to link packages and apps in a monorepo. Yarn workspaces require Yarn v1.22 (or newer) and Node.js v16 (or newer).
+- [Node.js](https://nodejs.org/) >= 14.0.0
+- [Yarn](https://yarnpkg.com/) >= 1.22.0
 
-Verify your environment:
-
-```bash
-node --version    # v16.0.0 or newer
-yarn --version    # v1.22.0 or newer
-```
-
-If your Yarn version is older, upgrade it globally:
+## Installation
 
 ```bash
-npm install -g yarn@latest
+# Clone the repository
+git clone https://github.com/<username>/simple-falling-sand-game.git
+cd simple-falling-sand-game
+
+# Install all dependencies
+yarn install
 ```
 
 ## Development
 
-### Dev Mode (Web Demo)
+### Building
 
-```bash
-yarn install
-yarn workspace web-demo dev
-```
-
-### Build Packages
+Compile all workspaces:
 
 ```bash
 yarn build
 ```
 
-### Run Tests
+This runs the `build` script in each workspace to compile TypeScript and generate the distribution bundles.
+
+### Running Tests
 
 ```bash
 yarn test
 ```
 
-## Documentation
+### Linting and Formatting
 
-See `docs/` for high-level design docs and API overviews.
+```bash
+yarn lint
+yarn lintfix
+yarn format
+```
 
-## Legacy Version
+## Running the Demo
 
-The original implementation can be found under `OLD/`. It is retained here until full migration is complete.
+Start the web demo in development mode:
+
+```bash
+yarn workspace web-demo dev
+```
+
+Open the local URL (e.g., http://localhost:5173) printed in the terminal to view the simulation.
+
+To build and preview the production bundle:
+
+```bash
+yarn build
+yarn workspace web-demo preview
+```
+
+## Package Usage
+
+For details on using the core packages in your own projects, see the individual package READMEs:
+
+- [`packages/behavior-library/README.md`](packages/behavior-library/README.md)
+- [`packages/simulation-engine/README.md`](packages/simulation-engine/README.md)
+- [`packages/ui-renderer/README.md`](packages/ui-renderer/README.md)
+
+## Contributing
+
+Contributions are welcome! Please open issues and pull requests for bug fixes and new features.
+
+## License
+
+This project is currently unlicensed.
