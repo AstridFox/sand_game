@@ -87,7 +87,12 @@ export function createSimulation(dims: Dims): SimulationAPI {
   }
 
   function reset(newDims: Dims): void {
-    ;[grid, newGrid] = createGrids(newDims)
+    if (newDims.width === dims.width && newDims.height === dims.height) {
+      grid.fill(AIR_ID)
+      newGrid.fill(AIR_ID)
+    } else {
+      [grid, newGrid] = createGrids(newDims)
+    }
   }
 
   return { startLoop, getScanState, getGrid, reset }
