@@ -19,6 +19,7 @@ pids/
 
 # Build output
 dist/
+**/dist/
 build/
 out/
 
@@ -47,3 +48,6 @@ coverage/
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# Package distribution files
+*.tgz
