@@ -33,7 +33,7 @@ Follow these steps to introduce a new cell in the behavior library:
    const MyCell: CellConfig = {
      id: MY_CELL,
      name: 'MyCell',
-     color: (x, y) => '#abcdef',
+     color: (x, y, t) => '#abcdef',
      priority: 1,
      behaviors: [
        createFall({ allowed: [/* e.g. AIR */] }),

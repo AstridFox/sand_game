@@ -25,7 +25,7 @@ import { createFall } from '../behaviors/movement'
 const BouncySand: CellConfig = {
   id: BOUNCY_SAND,
   name: 'BouncySand',
-  color: (x, y) => (x % 2 === 0 ? '#FF69B4' : '#FF1493'),
+  color: (x, y, t) => (x % 2 === 0 ? '#FF69B4' : '#FF1493'),
   priority: 1,
   behaviors: [
     // Falls downward like sand

@@ -34,7 +34,7 @@ export function createPalette(tooltip: HTMLElement): PaletteAPI {
 
     const icon = document.createElement('div')
     icon.className = 'palette-item-icon'
-    icon.style.background = cell.color(0, 0)
+    icon.style.background = cell.color(0, 0, 0)
     button.appendChild(icon)
 
     button.addEventListener('click', () => updateSelection(button))

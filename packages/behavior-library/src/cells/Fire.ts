@@ -5,6 +5,7 @@ import {
   createExtinguish,
   createSpawn,
 } from '../behaviors/combustion'
+import { noise } from '../behaviors/utils'
 import type { CellConfig } from '../Cell'
 
 const FIRE_SPREAD_PROB = 0.5
@@ -16,11 +17,14 @@ const FIRE_CINDER_PROB = 0.1
 const Fire: CellConfig = {
   id: FIRE,
   name: 'Fire',
-  color: (_x, _y) => {
-    const r = 200 + Math.random() * 55
-    const g = Math.random() * 100
-    const b = Math.random() * 50
-    return `rgb(${r | 0},${g | 0},${b | 0})`
+  color: (x, y, _t) => {
+    const t = performance.now()
+    const n = noise(x * 0.5, y * 0.5 + t / 100)
+    const brightness = 0.7 + 0.3 * Math.sin(t / 150 + n * 10)
+    const r = Math.floor(255 * brightness)
+    const g = Math.floor(180 * brightness * n)
+    const b = Math.floor(50 * brightness * n)
+    return `rgb(${r},${g},${b})`
   },
   priority: 4,
   behaviors: [

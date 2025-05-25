@@ -18,8 +18,8 @@ export interface CellConfig {
   id: number
   /** Human-readable name for this cell. */
   name: string
-  /** Color function for rendering this cell. */
-  color: (x: number, y: number) => string
+  /** Color function for rendering this cell. Receives x, y, and delta-time t (ms since last frame). */
+  color: (x: number, y: number, t: number) => string
   /** Priority for update ordering; higher values run later. */
   priority?: number
   /** List of behavior functions to execute each update. */
@@ -30,7 +30,7 @@ export interface CellConfig {
 export class Cell {
   public readonly id: number
   public readonly name: string
-  public readonly color: (x: number, y: number) => string
+  public readonly color: (x: number, y: number, t: number) => string
   public readonly priority: number
   public readonly behaviors: Behavior[]
 

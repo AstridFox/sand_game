@@ -35,7 +35,7 @@ const fallBehavior = movement.createFall({ allowed: [ids.AIR] })
    const MyCell: CellConfig = {
      id: MY_CELL,
      name: 'MyCell',
-     color: (x, y) => '#abcdef',
+     color: (x, y, t) => '#abcdef',
      priority: 1,
      behaviors: [],
    }
