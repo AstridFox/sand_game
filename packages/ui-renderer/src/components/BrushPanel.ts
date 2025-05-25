@@ -1,4 +1,8 @@
-import { addTooltipListeners, createSliderControl, setupPanelToggle } from '../utils'
+import {
+  addTooltipListeners,
+  createSliderControl,
+  setupPanelToggle,
+} from '../utils'
 
 export interface BrushPanelAPI {
   element: HTMLElement
@@ -19,18 +23,22 @@ export function createBrushPanel(tooltip: HTMLElement): BrushPanelAPI {
   const brushPanel = document.createElement('div')
   brushPanel.className = 'brush-panel'
 
-  const { control: sizeControl, slider: sizeSlider } =
-    createSliderControl('Size', 1, 50, brushSize, 'brush-size-slider')
+  const { control: sizeControl, slider: sizeSlider } = createSliderControl(
+    'Size',
+    1,
+    50,
+    brushSize,
+    'brush-size-slider',
+  )
   brushPanel.appendChild(sizeControl)
 
-  const { control: roundControl, slider: roundSlider } =
-    createSliderControl(
-      'Roundness',
-      0,
-      100,
-      brushRoundness * 100,
-      'brush-roundness-slider'
-    )
+  const { control: roundControl, slider: roundSlider } = createSliderControl(
+    'Roundness',
+    0,
+    100,
+    brushRoundness * 100,
+    'brush-roundness-slider',
+  )
   brushPanel.appendChild(roundControl)
 
   sizeSlider.addEventListener('input', () => {
@@ -46,6 +54,6 @@ export function createBrushPanel(tooltip: HTMLElement): BrushPanelAPI {
     element: brushButton,
     panel: brushPanel,
     getSize: () => brushSize,
-    getRoundness: () => brushRoundness
+    getRoundness: () => brushRoundness,
   }
 }

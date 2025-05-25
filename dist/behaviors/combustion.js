@@ -5,7 +5,9 @@ export function createSpread(opts) {
         const { width, height } = dims;
         const y = Math.floor(index / width);
         const x = index % width;
-        if (y > 0 && opts.targets.includes(grid[index - width]) && Math.random() < opts.prob) {
+        if (y > 0 &&
+            opts.targets.includes(grid[index - width]) &&
+            Math.random() < opts.prob) {
             newGrid[index - width] = grid[index];
         }
         if (y < height - 1 &&
@@ -13,7 +15,9 @@ export function createSpread(opts) {
             Math.random() < opts.prob) {
             newGrid[index + width] = grid[index];
         }
-        if (x > 0 && opts.targets.includes(grid[index - 1]) && Math.random() < opts.prob) {
+        if (x > 0 &&
+            opts.targets.includes(grid[index - 1]) &&
+            Math.random() < opts.prob) {
             newGrid[index - 1] = grid[index];
         }
         if (x < width - 1 &&

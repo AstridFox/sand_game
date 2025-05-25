@@ -10,5 +10,5 @@ createUI({
   container,
   dims,
   cellSize: 4,
-  horizontalJitter: true
+  horizontalJitter: true,
 })

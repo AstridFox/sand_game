@@ -11,30 +11,25 @@ The **simulation-engine** package provides the core double-buffered grid and sch
 ## Usage
 
 ```ts
-import {
-  dims,
-  createGrid,
-  createScanState,
-  update,
-} from 'simulation-engine';
+import { dims, createGrid, createScanState, update } from 'simulation-engine'
 
 // Initialize two buffers and scan state
-let grid = createGrid(dims);
-let newGrid = createGrid(dims);
-const scanState = createScanState(/* toggleScanDirection */ true);
+let grid = createGrid(dims)
+let newGrid = createGrid(dims)
+const scanState = createScanState(/* toggleScanDirection */ true)
 
 // cellMap: mapping from cell ID to cell definition (priority + update method)
 // priorities: sorted list of numeric priority values (ascending)
 
 // Run one simulation step (swap buffers each call)
-[grid, newGrid] = update(
+;[grid, newGrid] = update(
   grid,
   newGrid,
   cellMap,
   priorities,
   /* horizontalJitter */ false,
-  scanState
-);
+  scanState,
+)
 ```
 
 ## API

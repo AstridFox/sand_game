@@ -1,1 +1,1 @@
-{"version":3,"file":"Fire.d.ts","sourceRoot":"","sources":["../../packages/behavior-library/src/cells/Fire.ts"],"names":[],"mappings":"AAOA,OAAO,KAAK,EAAE,UAAU,EAAE,MAAM,SAAS,CAAC;AAQ1C,QAAA,MAAM,IAAI,EAAE,UAmBX,CAAC;AAEF,eAAe,IAAI,CAAC"}
+{"version":3,"file":"Fire.d.ts","sourceRoot":"","sources":["../../packages/behavior-library/src/cells/Fire.ts"],"names":[],"mappings":"AAOA,OAAO,KAAK,EAAE,UAAU,EAAE,MAAM,SAAS,CAAA;AAQzC,QAAA,MAAM,IAAI,EAAE,UAmBX,CAAA;AAED,eAAe,IAAI,CAAA"}

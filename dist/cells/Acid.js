@@ -5,7 +5,7 @@ const ACID_SPREAD_PROB = 0.02;
 const Acid = {
     id: ACID,
     name: 'Acid',
-    color: (x, y) => '#00FF00',
+    color: (_x, _y) => '#00FF00',
     priority: 2,
     behaviors: [
         createCorrode({

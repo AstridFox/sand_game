@@ -7,7 +7,7 @@ export interface DrawingAPI {
     getBrushSize: () => number,
     getBrushRoundness: () => number,
     getSelectedCellId: () => number,
-    grid: number[]
+    grid: number[],
   ): void
 }
 
@@ -18,7 +18,7 @@ export function createDrawing(): DrawingAPI {
     getBrushSize: () => number,
     getBrushRoundness: () => number,
     getSelectedCellId: () => number,
-    grid: number[]
+    grid: number[],
   ) {
     let drawing = false
 
@@ -53,11 +53,11 @@ export function createDrawing(): DrawingAPI {
       }
     }
 
-    canvas.addEventListener('mousedown', e => {
+    canvas.addEventListener('mousedown', (e) => {
       drawing = true
       drawAt(e)
     })
-    canvas.addEventListener('mousemove', e => drawing && drawAt(e))
+    canvas.addEventListener('mousemove', (e) => drawing && drawAt(e))
     window.addEventListener('mouseup', () => {
       drawing = false
     })

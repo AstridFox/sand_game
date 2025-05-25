@@ -93,7 +93,7 @@ export function fluid(index, grid, newGrid, dims, allowed) {
 }
 /** Attempts to move a cell like a gas, upward or sideways if the target is allowed. */
 export function gas(index, grid, newGrid, dims, allowed) {
-    const { width, height } = dims;
+    const { width } = dims;
     const y = Math.floor(index / width);
     const x = index % width;
     if (y > 0) {

@@ -7,10 +7,7 @@ export interface PaletteAPI {
   onClear(cb: () => void): void
 }
 
-export function createPalette(
-  tooltip: HTMLElement,
-  dims: { width: number; height: number }
-): PaletteAPI {
+export function createPalette(tooltip: HTMLElement): PaletteAPI {
   const palette = document.createElement('div')
   palette.className = 'palette'
 
@@ -19,14 +16,16 @@ export function createPalette(
   let selectedCellId = registry.getByName('Sand')?.id ?? 0
 
   const updateSelection = (button: HTMLButtonElement) => {
-    Array.from(palette.querySelectorAll('.palette-item.selected')).forEach(el => {
-      el.classList.remove('selected')
-    })
+    Array.from(palette.querySelectorAll('.palette-item.selected')).forEach(
+      (el) => {
+        el.classList.remove('selected')
+      },
+    )
     button.classList.add('selected')
     selectedCellId = Number(button.dataset.cellId)
   }
 
-  registry.getAll().forEach(cell => {
+  registry.getAll().forEach((cell) => {
     const button = document.createElement('button')
     button.className = 'palette-item'
     button.dataset.cellId = cell.id.toString()
@@ -58,8 +57,8 @@ export function createPalette(
   return {
     element: palette,
     getSelectedCellId: () => selectedCellId,
-    onClear: cb => {
+    onClear: (cb) => {
       clearCb = cb
-    }
+    },
   }
 }

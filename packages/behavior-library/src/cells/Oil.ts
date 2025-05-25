@@ -1,14 +1,14 @@
-import { OIL, FIRE, AIR } from '../ids';
-import { createNeighborTrigger } from '../behaviors/interaction';
-import { createFluid } from '../behaviors/movement';
-import type { CellConfig } from '../Cell';
+import { OIL, FIRE, AIR } from '../ids'
+import { createNeighborTrigger } from '../behaviors/interaction'
+import { createFluid } from '../behaviors/movement'
+import type { CellConfig } from '../Cell'
 
-const OIL_FIRE_SPREAD_PROB = 0.02;
+const OIL_FIRE_SPREAD_PROB = 0.02
 
 const Oil: CellConfig = {
   id: OIL,
   name: 'Oil',
-  color: (x, y) => '#333300',
+  color: (_x, _y) => '#333300',
   priority: 2,
   behaviors: [
     createNeighborTrigger({
@@ -18,6 +18,6 @@ const Oil: CellConfig = {
     }),
     createFluid({ allowed: [AIR] }),
   ],
-};
+}
 
-export default Oil;
+export default Oil

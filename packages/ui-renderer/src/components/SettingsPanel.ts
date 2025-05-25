@@ -11,7 +11,7 @@ export interface SettingsPanelAPI {
 export function createSettingsPanel(
   tooltip: HTMLElement,
   initialJitter: boolean,
-  scanState: ScanState
+  scanState: ScanState,
 ): SettingsPanelAPI {
   const settingsButton = document.createElement('button')
   settingsButton.className = 'brush-button'
@@ -53,11 +53,13 @@ export function createSettingsPanel(
   return {
     element: settingsButton,
     panel: settingsPanel,
-    onJitterChange: cb => {
-      jitterCheckbox.addEventListener('change', () => cb(jitterCheckbox.checked))
+    onJitterChange: (cb) => {
+      jitterCheckbox.addEventListener('change', () =>
+        cb(jitterCheckbox.checked),
+      )
     },
-    onScanToggle: cb => {
+    onScanToggle: (cb) => {
       scanCheckbox.addEventListener('change', () => cb(scanCheckbox.checked))
-    }
+    },
   }
 }

@@ -13,7 +13,7 @@ export function scheduleTree(startX, startY, dims) {
     const BRANCH_LEN_MAX = 6;
     const tasks = [];
     const trunkPoints = [];
-    let x = startX;
+    const x = startX;
     let y = startY;
     for (let i = 0; i < TRUNK_HEIGHT; i++) {
         if (y - 1 < 0)
@@ -37,6 +37,8 @@ export function scheduleTree(startX, startY, dims) {
     }
     while (branches.length > 0) {
         const br = branches.pop();
+        if (!br)
+            break;
         const len = BRANCH_LEN_MIN +
             Math.floor(Math.random() * (BRANCH_LEN_MAX - BRANCH_LEN_MIN));
         let bx = br.x;

@@ -27,14 +27,14 @@ export function createUI(options: UIOptions): void {
   root.appendChild(tooltip)
 
   const brush = createBrushPanel(tooltip)
-  const palette = createPalette(tooltip, dims)
+  const palette = createPalette(tooltip)
   palette.element.prepend(brush.element)
-  
+
   const simulation = createSimulation(dims)
   const settings = createSettingsPanel(
     tooltip,
     horizontalJitter,
-    simulation.getScanState()
+    simulation.getScanState(),
   )
   const canvasView = createCanvasView(dims, cellSize)
   const drawing = createDrawing()
@@ -47,24 +47,24 @@ export function createUI(options: UIOptions): void {
   container.appendChild(root)
   root.appendChild(canvasView.wrapper)
 
-  simulation.startLoop(
-    canvasView.canvas.getContext('2d')!,
-    dims,
-    () => horizontalJitter
-  )
+  const ctx = canvasView.canvas.getContext('2d')
+  if (!ctx) {
+    throw new Error('2D context not supported')
+  }
+  simulation.startLoop(ctx, dims, () => horizontalJitter)
   drawing.enableDrawing(
     canvasView.canvas,
     dims,
     () => brush.getSize(),
     () => brush.getRoundness(),
     () => palette.getSelectedCellId(),
-    simulation.getGrid()
+    simulation.getGrid(),
   )
 
-  settings.onJitterChange(on => {
+  settings.onJitterChange((on) => {
     horizontalJitter = on
   })
-  settings.onScanToggle(on => {
+  settings.onScanToggle((on) => {
     simulation.getScanState().toggleScanDirection = on
   })
   palette.onClear(() => simulation.reset(dims))

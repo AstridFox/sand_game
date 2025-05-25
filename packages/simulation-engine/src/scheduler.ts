@@ -1,15 +1,15 @@
-import { dims } from './config';
+import { dims } from './config'
 
 /**
  * Double-buffered scan state controlling the update order.
  */
 export interface ScanState {
   /** Process cells left-to-right when true, right-to-left when false */
-  scanLeftToRight: boolean;
+  scanLeftToRight: boolean
   /** Process cells bottom-to-top when true, top-to-bottom when false */
-  scanBottomToTop: boolean;
+  scanBottomToTop: boolean
   /** Toggle scan directions after each update when true */
-  toggleScanDirection: boolean;
+  toggleScanDirection: boolean
 }
 
 /**
@@ -17,19 +17,14 @@ export interface ScanState {
  */
 export interface CellDefinition {
   /** Higher priority values run later in the update loop */
-  priority: number;
+  priority: number
   /** Invoked for each cell index matching this definition
    * @param index linear index into the grid
    * @param grid current grid buffer
    * @param newGrid next grid buffer (double-buffered)
    * @param dims grid dimensions
    */
-  update(
-    index: number,
-    grid: Uint8Array,
-    newGrid: Uint8Array,
-    dims: Dims
-  ): void;
+  update(index: number, grid: Uint8Array, newGrid: Uint8Array, dims: Dims): void
 }
 
 /**
@@ -41,21 +36,21 @@ export function createScanState(toggleScanDirection = false): ScanState {
     scanLeftToRight: true,
     scanBottomToTop: true,
     toggleScanDirection,
-  };
+  }
 }
 
 /**
  * Create an empty grid buffer for the given dimensions.
  */
 export function createGrid(dims: Dims): Uint8Array {
-  return new Uint8Array(dims.width * dims.height);
+  return new Uint8Array(dims.width * dims.height)
 }
 
 /**
  * Create a pair of empty grids (double-buffered) for the given dimensions.
  */
 export function createGrids(dims: Dims): [Uint8Array, Uint8Array] {
-  return [createGrid(dims), createGrid(dims)];
+  return [createGrid(dims), createGrid(dims)]
 }
 
 /**
@@ -76,10 +71,10 @@ export function update(
   cellMap: Record<number, CellDefinition>,
   priorities: number[],
   horizontalJitter: boolean,
-  scanState: ScanState
+  scanState: ScanState,
 ): [Uint8Array, Uint8Array] {
-  const { width, height } = dims;
-  newGrid.set(grid);
+  const { width, height } = dims
+  newGrid.set(grid)
 
   for (const prio of priorities) {
     for (
@@ -87,31 +82,31 @@ export function update(
       scanState.scanBottomToTop ? y >= 0 : y < height;
       y += scanState.scanBottomToTop ? -1 : 1
     ) {
-      const offset = horizontalJitter ? Math.floor(Math.random() * width) : 0;
+      const offset = horizontalJitter ? Math.floor(Math.random() * width) : 0
       for (let dx = 0; dx < width; dx++) {
-        let x: number;
+        let x: number
         if (horizontalJitter) {
           x = scanState.scanLeftToRight
             ? (offset + dx) % width
-            : (offset - dx + width) % width;
+            : (offset - dx + width) % width
         } else if (scanState.scanLeftToRight) {
-          x = dx;
+          x = dx
         } else {
-          x = width - 1 - dx;
+          x = width - 1 - dx
         }
-        const i = y * width + x;
-        const cell = cellMap[grid[i]];
+        const i = y * width + x
+        const cell = cellMap[grid[i]]
         if (cell.priority === prio) {
-          cell.update(i, grid, newGrid, dims);
+          cell.update(i, grid, newGrid, dims)
         }
       }
     }
   }
 
   if (scanState.toggleScanDirection) {
-    scanState.scanLeftToRight = !scanState.scanLeftToRight;
-    scanState.scanBottomToTop = !scanState.scanBottomToTop;
+    scanState.scanLeftToRight = !scanState.scanLeftToRight
+    scanState.scanBottomToTop = !scanState.scanBottomToTop
   }
 
-  return [newGrid, grid];
+  return [newGrid, grid]
 }

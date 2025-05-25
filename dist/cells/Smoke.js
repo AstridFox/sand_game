@@ -5,7 +5,7 @@ const SMOKE_DECAY_PROB = 0.02;
 const Smoke = {
     id: SMOKE,
     name: 'Smoke',
-    color: (x, y) => '#bdc3c7',
+    color: (_x, _y) => '#bdc3c7',
     priority: 5,
     behaviors: [
         createRandomTransform({ target: AIR, prob: SMOKE_DECAY_PROB }),

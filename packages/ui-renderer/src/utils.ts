@@ -1,4 +1,8 @@
-export function addTooltipListeners(element: HTMLElement, tooltip: HTMLElement, getText: (e: MouseEvent) => string) {
+export function addTooltipListeners(
+  element: HTMLElement,
+  tooltip: HTMLElement,
+  getText: (e: MouseEvent) => string,
+) {
   element.addEventListener('mouseenter', (e: MouseEvent) => {
     tooltip.textContent = getText(e)
     const rect = (e.target as HTMLElement).getBoundingClientRect()
@@ -27,7 +31,7 @@ export function setupPanelToggle(button: HTMLElement, panel: HTMLElement) {
     }
   }
 
-  button.addEventListener('mouseenter', (e: MouseEvent) => {
+  button.addEventListener('mouseenter', () => {
     show()
     const rect = button.getBoundingClientRect()
     panel.style.left = `${rect.right + 8}px`
@@ -43,7 +47,7 @@ export function createSliderControl(
   min: number,
   max: number,
   initial: number,
-  sliderClass: string
+  sliderClass: string,
 ): { control: HTMLDivElement; slider: HTMLInputElement } {
   const control = document.createElement('div')
   control.className = 'brush-control'
@@ -60,7 +64,9 @@ export function createSliderControl(
   return { control, slider }
 }
 
-export function createSeparator(className = 'palette-separator'): HTMLHRElement {
+export function createSeparator(
+  className = 'palette-separator',
+): HTMLHRElement {
   const hr = document.createElement('hr')
   hr.className = className
   return hr
@@ -81,7 +87,7 @@ export function hexToRgb(hex: string): [number, number, number] | null {
   if (clean.length === 3) {
     clean = clean
       .split('')
-      .map(c => c + c)
+      .map((c) => c + c)
       .join('')
   }
   const num = parseInt(clean, 16)

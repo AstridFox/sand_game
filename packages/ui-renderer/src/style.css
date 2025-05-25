@@ -125,7 +125,7 @@
   color: #ccc;
   font-size: 14px;
 }
-.brush-control input[type="range"] {
+.brush-control input[type='range'] {
   flex: 1;
 }
 
@@ -149,7 +149,7 @@
 .settings-control:last-child {
   margin-bottom: 0;
 }
-.settings-control input[type="checkbox"] {
+.settings-control input[type='checkbox'] {
   margin-right: 8px;
 }
 .settings-control label {

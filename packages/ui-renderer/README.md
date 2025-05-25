@@ -26,8 +26,8 @@ if (!container) {
 createUI({
   container,
   dims,
-  cellSize: 4,          // optional, default is 4
-  horizontalJitter: true // optional, default is false
+  cellSize: 4, // optional, default is 4
+  horizontalJitter: true, // optional, default is false
 })
 ```
 

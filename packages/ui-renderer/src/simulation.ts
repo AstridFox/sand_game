@@ -4,7 +4,7 @@ import {
   update as updateSim,
   type Dims,
   type ScanState,
-  type CellDefinition
+  type CellDefinition,
 } from 'simulation-engine'
 import registry from 'behavior-library'
 import { hexToRgb } from './utils'
@@ -13,7 +13,7 @@ export interface SimulationAPI {
   startLoop(
     ctx: CanvasRenderingContext2D,
     dims: Dims,
-    horizontalJitter: () => boolean
+    horizontalJitter: () => boolean,
   ): void
   getScanState(): ScanState
   getGrid(): number[]
@@ -26,16 +26,16 @@ export function createSimulation(dims: Dims): SimulationAPI {
 
   const cells = registry.getAll()
   const cellMap: Record<number, CellDefinition> = {}
-  cells.forEach(c => {
+  cells.forEach((c) => {
     cellMap[c.id] = c
   })
 
-  const priorities = Array.from(new Set(cells.map(c => c.priority))).sort(
-    (a, b) => a - b
+  const priorities = Array.from(new Set(cells.map((c) => c.priority))).sort(
+    (a, b) => a - b,
   )
 
   const idToRgb: [number, number, number][] = []
-  cells.forEach(c => {
+  cells.forEach((c) => {
     const hex = c.color(0, 0)
     const rgb = hexToRgb(hex)
     idToRgb[c.id] = rgb || [0, 0, 0]
@@ -46,7 +46,7 @@ export function createSimulation(dims: Dims): SimulationAPI {
   function startLoop(
     ctx: CanvasRenderingContext2D,
     dims: Dims,
-    horizontalJitter: () => boolean
+    horizontalJitter: () => boolean,
   ) {
     ctx.imageSmoothingEnabled = false
     const imageData = ctx.createImageData(dims.width, dims.height)
@@ -58,7 +58,7 @@ export function createSimulation(dims: Dims): SimulationAPI {
         cellMap,
         priorities,
         horizontalJitter,
-        scanState
+        scanState,
       )
 
       const data = imageData.data

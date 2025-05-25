@@ -5,7 +5,7 @@ const OIL_FIRE_SPREAD_PROB = 0.02;
 const Oil = {
     id: OIL,
     name: 'Oil',
-    color: (x, y) => '#333300',
+    color: (_x, _y) => '#333300',
     priority: 2,
     behaviors: [
         createNeighborTrigger({

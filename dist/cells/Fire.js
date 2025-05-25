@@ -8,11 +8,11 @@ const FIRE_CINDER_PROB = 0.1;
 const Fire = {
     id: FIRE,
     name: 'Fire',
-    color: (x, y) => {
+    color: (_x, _y) => {
         const r = 200 + Math.random() * 55;
         const g = Math.random() * 100;
         const b = Math.random() * 50;
-        return `rgb(${(r | 0)},${(g | 0)},${(b | 0)})`;
+        return `rgb(${r | 0},${g | 0},${b | 0})`;
     },
     priority: 4,
     behaviors: [

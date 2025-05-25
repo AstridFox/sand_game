@@ -25,12 +25,14 @@ This repository is a ground-up rewrite of the Simple Falling Sand Game into a mo
 This project uses Yarn workspaces to link packages and apps in a monorepo. Yarn workspaces require Yarn v1.22 (or newer) and Node.js v16 (or newer).
 
 Verify your environment:
+
 ```bash
 node --version    # v16.0.0 or newer
 yarn --version    # v1.22.0 or newer
 ```
 
 If your Yarn version is older, upgrade it globally:
+
 ```bash
 npm install -g yarn@latest
 ```
@@ -38,17 +40,20 @@ npm install -g yarn@latest
 ## Development
 
 ### Dev Mode (Web Demo)
+
 ```bash
 yarn install
 yarn workspace web-demo dev
 ```
 
 ### Build Packages
+
 ```bash
 yarn build
 ```
 
 ### Run Tests
+
 ```bash
 yarn test
 ```

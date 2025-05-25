@@ -1,22 +1,25 @@
-import { PLANT, WATER, WOOD } from '../ids';
+import { PLANT, WATER, WOOD } from '../ids'
 import {
   createRandomTransform,
   createNeighborPropagation,
-} from '../behaviors/interaction';
-import type { CellConfig } from '../Cell';
+} from '../behaviors/interaction'
+import type { CellConfig } from '../Cell'
 
-const GROWTH_PROBABILITY = 0.2;
-const PLANT_TO_WOOD_PROBABILITY = 0.001;
+const GROWTH_PROBABILITY = 0.2
+const PLANT_TO_WOOD_PROBABILITY = 0.001
 
 const Plant: CellConfig = {
   id: PLANT,
   name: 'Plant',
-  color: (x, y) => '#2ecc71',
+  color: (_x, _y) => '#2ecc71',
   priority: 3,
   behaviors: [
     createRandomTransform({ target: WOOD, prob: PLANT_TO_WOOD_PROBABILITY }),
-    createNeighborPropagation({ triggerCells: [WATER], prob: GROWTH_PROBABILITY }),
+    createNeighborPropagation({
+      triggerCells: [WATER],
+      prob: GROWTH_PROBABILITY,
+    }),
   ],
-};
+}
 
-export default Plant;
+export default Plant

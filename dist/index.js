@@ -60,7 +60,7 @@ const configs = [
     Lava,
 ];
 /** Array of all cell instances. */
-export const cells = configs.map(cfg => new Cell(cfg));
+export const cells = configs.map((cfg) => new Cell(cfg));
 /** Singleton cell registry. */
 export const registry = new CellRegistry(cells);
 export { ids, movement, combustion, corrosion, growth, interaction, utils };
