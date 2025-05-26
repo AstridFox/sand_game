@@ -36,7 +36,11 @@ Follow these steps to introduce a new cell in the behavior library:
      color: (x, y, t) => '#abcdef',
      priority: 1,
      behaviors: [
-       createFall({ allowed: [/* e.g. AIR */] }),
+       createFall({
+         allowed: [
+           /* e.g. AIR */
+         ],
+       }),
      ],
    }
 
@@ -69,7 +73,9 @@ Custom behaviors let you implement arbitrary update logic for cells. To add one:
    ```ts
    import type { Behavior, Dims } from '../Cell'
 
-   export function createMyBehavior(opts: { /* options */ }): Behavior {
+   export function createMyBehavior(opts: {
+     /* options */
+   }): Behavior {
      return (_cell, index, grid, newGrid, dims) => {
        // custom logic here
        return false

@@ -6,7 +6,7 @@ import {
   type ScanState,
   type CellDefinition,
 } from 'simulation-engine'
-import registry from 'behavior-library'
+import registry, { growth } from 'behavior-library'
 import { hexToRgb } from './utils'
 
 export interface SimulationAPI {
@@ -33,7 +33,7 @@ export function createSimulation(dims: Dims): SimulationAPI {
   const priorities = Array.from(new Set(cells.map((c) => c.priority))).sort(
     (a, b) => a - b,
   )
-  
+
   const AIR_ID = registry.getByName('Air')?.id ?? 0
 
   function startLoop(
@@ -41,50 +41,49 @@ export function createSimulation(dims: Dims): SimulationAPI {
     dims: Dims,
     horizontalJitter: () => boolean,
   ) {
-  ctx.imageSmoothingEnabled = false
-  const imageData = ctx.createImageData(dims.width, dims.height)
-  let lastTime = performance.now()
+    ctx.imageSmoothingEnabled = false
+    const imageData = ctx.createImageData(dims.width, dims.height)
+    let lastTime = performance.now()
 
-  function frame() {
-    const now = performance.now()
-    const delta = now - lastTime
-    lastTime = now
+    function frame() {
+      const now = performance.now()
+      const delta = now - lastTime
+      lastTime = now
+      ;[grid, newGrid] = updateSim(
+        grid,
+        newGrid,
+        cellMap,
+        priorities,
+        horizontalJitter,
+        scanState,
+      )
+      growth.processGrowth(grid, dims)
 
-    ;[grid, newGrid] = updateSim(
-      grid,
-      newGrid,
-      cellMap,
-      priorities,
-      horizontalJitter,
-      scanState,
-    )
-
-
-    const data = imageData.data
-    for (let i = 0; i < grid.length; i++) {
-      const id = grid[i]
-      const idx = i * 4
-      if (id === AIR_ID) {
-        data[idx] = 0
-        data[idx + 1] = 0
-        data[idx + 2] = 0
-        data[idx + 3] = 0
-      } else {
-        const x = i % dims.width
-        const y = Math.floor(i / dims.width)
-        const hex = cellMap[id].color(x, y, delta)
-        const rgb = hexToRgb(hex) || [0, 0, 0]
-        data[idx] = rgb[0]
-        data[idx + 1] = rgb[1]
-        data[idx + 2] = rgb[2]
-        data[idx + 3] = 255
+      const data = imageData.data
+      for (let i = 0; i < grid.length; i++) {
+        const id = grid[i]
+        const idx = i * 4
+        if (id === AIR_ID) {
+          data[idx] = 0
+          data[idx + 1] = 0
+          data[idx + 2] = 0
+          data[idx + 3] = 0
+        } else {
+          const x = i % dims.width
+          const y = Math.floor(i / dims.width)
+          const hex = cellMap[id].color(x, y, delta)
+          const rgb = hexToRgb(hex) || [0, 0, 0]
+          data[idx] = rgb[0]
+          data[idx + 1] = rgb[1]
+          data[idx + 2] = rgb[2]
+          data[idx + 3] = 255
+        }
       }
-    }
 
-    ctx.putImageData(imageData, 0, 0)
+      ctx.putImageData(imageData, 0, 0)
+      requestAnimationFrame(frame)
+    }
     requestAnimationFrame(frame)
-  }
-  requestAnimationFrame(frame)
   }
 
   function getScanState(): ScanState {
@@ -100,7 +99,7 @@ export function createSimulation(dims: Dims): SimulationAPI {
       grid.fill(AIR_ID)
       newGrid.fill(AIR_ID)
     } else {
-      [grid, newGrid] = createGrids(newDims)
+      ;[grid, newGrid] = createGrids(newDims)
     }
   }
 
