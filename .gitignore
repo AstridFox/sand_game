@@ -5,6 +5,7 @@ node_modules/
 
 # Yarn PnP
 .pnp.*
+yarn.lock
 
 # Logs
 npm-debug.log*
