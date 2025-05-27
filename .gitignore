@@ -28,7 +28,7 @@ out/
 .vite/
 
 # TypeScript cache
-*.tsbuildinfo
+**/tsconfig.buildinfo
 
 # Coverage outputs
 coverage/
